@@ -1,0 +1,51 @@
+# Every claim geluapprox makes, each tied to the artifact that proves it.
+# Verify integrity with ./scripts/gate.sh; reproduce with ./reproduce.sh.
+
+[project]
+name = "geluapprox"
+summary = "Fidelity and cost of the three standard GELU forms - exact-erf, tanh approximation (gelu_new), and sigmoid approximation (x*sigmoid(1.702x)) - measured against an f64 exact-erf reference over x in [-8, 8]. They are not interchangeable: the tanh approximation is faithful (max abs error 4.7e-4) but the sigmoid approximation is 43x worse (2.0e-2, a 2% activation error). There is a real speed/accuracy tradeoff: sigmoid is the cheapest form, exact-erf ~9.5x slower, the tanh approximation ~4.3x the sigmoid cost and in between - so the tanh form is the Pareto sweet spot. The approximation error concentrates in the mid-range elbow (|x| ~ 2-3), exactly symmetric (a provably even function of x), not the negative region. f32 precision is not the limiter (exact-f32 error 4.5e-7, thousands of times below either approximation)."
+language = "C++ with Python analysis"
+license = "MIT"
+oracles = "an f64 exact-erf GELU (std::erf) reference; error is exact max-abs and RMS deviation of the f32 output over a dense grid. Self-contained deterministic input (no model, no network). Throughput is minimum-over-reps steady-clock time. verify.py recomputes the fidelity ordering, the speed ordering, the f32-sufficiency, and the worst-region result independently of analyze.py. No LLM judge."
+
+[[claim]]
+id = "pre-registered-prediction"
+statement = "Four predictions were committed to git in PREREG.md before benchmarking - not interchangeable (P1), sigmoid error concentrates in the negative region (P2), a speed/accuracy tradeoff (P3), f32 not the limiter (P4). P1, P3, P4 held; P2 was refined - the error concentrates in the mid-range elbow (|x| ~ 2-3) exactly symmetrically (a provably even function of x), not the negative side. PREREG.md is not edited after the results."
+evidence = "PREREG.md (committed before results); README pre-registration section; bench_results/frontier.md."
+status = "verified"
+
+[[claim]]
+id = "not-interchangeable"
+statement = "The tanh and sigmoid GELU approximations are not interchangeable: the tanh approximation is faithful to exact GELU (max abs error 4.7e-4, ~0.05%) while the sigmoid approximation is 43x worse (2.0e-2, ~2%). Substituting the sigmoid form for exact GELU introduces a two-percent activation error."
+evidence = "bench_results/frontier.md accuracy table; tests/test_gelu.cpp asserts tanh err < 1e-3, sigmoid err > 1e-2, sigmoid > 10x tanh; tools/verify.py re-asserts the same from the raw data."
+status = "verified"
+
+[[claim]]
+id = "speed-accuracy-tradeoff"
+statement = "There is a real speed/accuracy tradeoff with the tanh form as the Pareto sweet spot: the sigmoid form is the cheapest (one exp), the exact-erf form ~9.5x slower (erf is expensive), and the tanh approximation ~4.3x the sigmoid cost - so the fastest form is by far the least accurate, and the tanh form gives most of exact's fidelity at a fraction of its cost."
+evidence = "bench_results/frontier.md throughput table; tools/verify.py asserts the ns ordering sigmoid < tanh < exact_f32."
+status = "verified"
+
+[[claim]]
+id = "error-in-mid-elbow"
+statement = "Both approximations' error concentrates in the mid-range elbow (|x| ~ 2-3, the curved part of GELU) and is near-exact in the tails, EXACTLY symmetric between the positive and negative mid regions - the error is a provably even function of x (GELU(x)-GELU(-x)=x holds for all three forms), so it cannot concentrate on the negative side, refining the pre-registered P2 guess."
+evidence = "bench_results/frontier.md error-by-region table; tools/verify.py asserts the worst region for both approximations is a mid region (not a tail) and that the sigmoid neg_mid and pos_mid maxima agree (even function)."
+status = "verified"
+
+[[claim]]
+id = "f32-not-the-limiter"
+statement = "f32 precision is not the limiting factor: the exact form computed in f32 has error 4.5e-7 against the f64 reference, thousands of times below either approximation's error. The engineering choice that matters is which approximation, not the float width."
+evidence = "bench_results/frontier.md accuracy table exact_f32 row; tools/verify.py asserts exact_f32 error < 1% of the tanh error."
+status = "verified"
+
+[[claim]]
+id = "no-overclaim"
+statement = "One ISA (ARM), one compiler, the standard approximation constants. Absolute ns are machine-specific (the platform's libm erf/tanh/exp); the ordering and the fidelity ratios are the claims. A hand-vectorized polynomial erf/tanh/exp would change absolute throughput and its own accuracy, which this study does not explore - it measures the standard compiled forms. The error magnitudes are activation-space, not a downstream model-quality claim. The adversarial review is in REVIEW.md."
+evidence = "README limitations + falsifiers; REVIEW.md."
+status = "verified"
+
+[[claim]]
+id = "clean-build"
+statement = "The C++ builds with -std=c++20 -O3 -march=native -Wall -Wextra -Werror and zero warnings, the self-contained C++ tests pass (exact reference values, kernels match their scalar definitions, the tanh-close / sigmoid-far fidelity ordering), the Python is ruff-clean and mypy --strict clean, sources are pure ASCII, the independent verify passes, and no private operating-environment details are present."
+evidence = "scripts/gate.sh."
+status = "verified"

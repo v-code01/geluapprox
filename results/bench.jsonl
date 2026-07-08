@@ -1,0 +1,18 @@
+{"kind": "acc", "variant": "exact_f32", "region": "all", "max_err": 4.472442e-07, "rms_err": 6.826744e-08}
+{"kind": "acc", "variant": "exact_f32", "region": "neg_tail", "max_err": 8.240592e-08, "rms_err": 2.871620e-08}
+{"kind": "acc", "variant": "exact_f32", "region": "neg_mid", "max_err": 4.603386e-08, "rms_err": 1.647427e-08}
+{"kind": "acc", "variant": "exact_f32", "region": "pos_mid", "max_err": 2.328730e-07, "rms_err": 5.841734e-08}
+{"kind": "acc", "variant": "exact_f32", "region": "pos_tail", "max_err": 4.472442e-07, "rms_err": 1.089815e-07}
+{"kind": "acc", "variant": "tanh", "region": "all", "max_err": 4.733508e-04, "rms_err": 1.743830e-04}
+{"kind": "acc", "variant": "tanh", "region": "neg_tail", "max_err": 4.119119e-04, "rms_err": 1.068134e-04}
+{"kind": "acc", "variant": "tanh", "region": "neg_mid", "max_err": 4.732559e-04, "rms_err": 2.491628e-04}
+{"kind": "acc", "variant": "tanh", "region": "pos_mid", "max_err": 4.733508e-04, "rms_err": 2.490472e-04}
+{"kind": "acc", "variant": "tanh", "region": "pos_tail", "max_err": 4.121361e-04, "rms_err": 1.069622e-04}
+{"kind": "acc", "variant": "sigmoid", "region": "all", "max_err": 2.033510e-02, "rms_err": 8.402049e-03}
+{"kind": "acc", "variant": "sigmoid", "region": "neg_tail", "max_err": 1.400902e-02, "rms_err": 4.182251e-03}
+{"kind": "acc", "variant": "sigmoid", "region": "neg_mid", "max_err": 2.033486e-02, "rms_err": 1.261394e-02}
+{"kind": "acc", "variant": "sigmoid", "region": "pos_mid", "max_err": 2.033510e-02, "rms_err": 1.261135e-02}
+{"kind": "acc", "variant": "sigmoid", "region": "pos_tail", "max_err": 1.402149e-02, "rms_err": 4.186523e-03}
+{"kind": "thr", "variant": "exact_f32", "n": 65536, "ns": 599833.0}
+{"kind": "thr", "variant": "tanh", "n": 65536, "ns": 271209.0}
+{"kind": "thr", "variant": "sigmoid", "n": 65536, "ns": 63084.0}
